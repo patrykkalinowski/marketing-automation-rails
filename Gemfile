@@ -32,6 +32,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Devise for users
+gem 'devise'
 # Ahoy analytics
 gem 'ahoy_matey'
 # SQLite for Ahoy
