@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  get 'users/index'
+
+  get 'users/:id/dashboard' => 'users#dashboard'
+
   devise_for :users
   get 'home/index'
   get 'home/visits'

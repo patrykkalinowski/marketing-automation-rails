@@ -9,6 +9,6 @@ class HomeController < ApplicationController
     @current_user = current_user
     @current_visit = current_visit
     @user_visits = current_user.visits
-    @user_events = Ahoy::Event.where(user_id: current_user)
+    @user_events = Ahoy::Event.where(user_id: current_user).reverse_order
   end
 end

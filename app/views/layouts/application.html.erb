@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MarketingAutomationRails</title>
+  <title><%= yield(:title).empty? ? "Marketing Automation Rails" : yield(:title) %></title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
@@ -12,6 +12,11 @@
   <p class="alert"><%= alert %></p>
 
 <%= yield %>
+
+
+<script>
+ahoy.trackView();
+</script>
 
 </body>
 </html>

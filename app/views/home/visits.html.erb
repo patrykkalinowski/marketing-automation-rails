@@ -16,5 +16,5 @@ Visits:
 
 Events:
 <% @user_events.each do |event| %>
-<p><%= current_user.identity %>: <%= event.name %> <%= event.properties['title'] %> on <%= event.time %></p>
+<p><%= current_user.identity %>: <%= event.name %> <a href="<%= event.properties['url'] %>"><%= event.properties['title']%></a> on <%= event.time %></p>
 <% end %>

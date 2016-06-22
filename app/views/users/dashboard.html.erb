@@ -1,0 +1,13 @@
+<% content_for(:title) do %>
+  <%= @user.identity %> dashboard
+<% end %>
+
+
+
+<h1>Users#dashboard</h1>
+<p>Find me in app/views/users/dashboard.html.erb</p>
+
+Events:
+<% @user_events.each do |event| %>
+<p><%= current_user.identity %>: <%= event.name %> <a href="<%= event.properties['url'] %>"><%= event.properties['title']%></a> on <%= event.time %></p>
+<% end %>
