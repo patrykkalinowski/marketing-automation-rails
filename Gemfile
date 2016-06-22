@@ -34,9 +34,10 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Ahoy analytics
 gem 'ahoy_matey'
-
 # SQLite for Ahoy
 gem 'activeuuid', '>= 0.5.0'
+# Ahoy for emails
+gem 'ahoy_email'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

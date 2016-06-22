@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160622190022) do
+ActiveRecord::Schema.define(version: 20160622190209) do
 
   create_table "ahoy_events", force: :cascade do |t|
     t.integer  "visit_id"
@@ -24,6 +24,22 @@ ActiveRecord::Schema.define(version: 20160622190022) do
   add_index "ahoy_events", ["name", "time"], name: "index_ahoy_events_on_name_and_time"
   add_index "ahoy_events", ["user_id", "name"], name: "index_ahoy_events_on_user_id_and_name"
   add_index "ahoy_events", ["visit_id", "name"], name: "index_ahoy_events_on_visit_id_and_name"
+
+  create_table "ahoy_messages", force: :cascade do |t|
+    t.string   "token"
+    t.text     "to"
+    t.integer  "user_id"
+    t.string   "user_type"
+    t.string   "mailer"
+    t.text     "subject"
+    t.text     "content"
+    t.datetime "sent_at"
+    t.datetime "opened_at"
+    t.datetime "clicked_at"
+  end
+
+  add_index "ahoy_messages", ["token"], name: "index_ahoy_messages_on_token"
+  add_index "ahoy_messages", ["user_id", "user_type"], name: "index_ahoy_messages_on_user_id_and_user_type"
 
   create_table "visits", force: :cascade do |t|
     t.string   "visit_token"

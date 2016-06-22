@@ -40,6 +40,11 @@ GEM
       activerecord (>= 3.1)
       uuidtools
     addressable (2.4.0)
+    ahoy_email (0.3.1)
+      addressable
+      nokogiri
+      rails
+      safely_block
     ahoy_matey (1.4.2)
       addressable
       browser (~> 2.0)
@@ -169,6 +174,7 @@ PLATFORMS
 
 DEPENDENCIES
   activeuuid (>= 0.5.0)
+  ahoy_email
   ahoy_matey
   byebug
   coffee-rails (~> 4.1.0)
