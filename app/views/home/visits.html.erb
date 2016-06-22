@@ -9,6 +9,12 @@
 
 <hr/>
 
+Visits:
 <% @user_visits.each do |visit| %>
-<p><%= current_user.email %> visited <%= visit.landing_page %> on <%= visit.started_at %></p>
+<p><%= current_user.identity %> visited <%= visit.landing_page %> on <%= visit.started_at %></p>
+<% end %>
+
+Events:
+<% @user_events.each do |event| %>
+<p><%= current_user.identity %>: <%= event.name %> <%= event.properties['title'] %> on <%= event.time %></p>
 <% end %>

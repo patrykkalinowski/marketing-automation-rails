@@ -5,4 +5,12 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
 
   has_many :visits
+
+  def identity
+    if self.first_name || self.last_name
+      "#{self.first_name} #{self.last_name}"
+    else
+      self.email
+    end
+  end
 end
