@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+  get 'leads/index'
+
+  get 'leads/show'
+
+  get 'leads/edit'
+
+  get 'messages/index'
+
+  get 'messages/show'
+
+  get 'messages/edit'
+
   get 'users/index'
 
   get 'users/:id/dashboard' => 'users#dashboard'
