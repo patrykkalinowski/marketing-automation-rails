@@ -11,6 +11,7 @@ class HomeController < ApplicationController
     @user_visits = current_user.visits
     @user_events = Ahoy::Event.where(user_id: current_user).reverse_order
 
-    current_user.send_welcome_email
+    message = Message.find 1
+    message.send_email(current_user)
   end
 end

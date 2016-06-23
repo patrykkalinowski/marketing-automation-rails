@@ -1,2 +1,14 @@
-<h1>Messages#edit</h1>
-<p>Find me in app/views/messages/edit.html.erb</p>
+
+
+<%= form_for :message, url: message_path(@message), method: :patch do |f| %>
+  <p>From: <%= f.text_field :from_name %></p>
+  <p>From email: <%= f.text_field :from_email %></p>
+  <p>Subject: <%= f.text_field :subject %></p>
+  <p>Content</p>
+  <p><%= f.text_area :content, class: "tinymce", rows: 40, cols: 120 %></p>
+  <%= f.submit "Update" %>
+<% end %>
+
+<!-- Load and initialize TinyMCE -->
+<%= tinymce_assets %>
+<%= tinymce %>

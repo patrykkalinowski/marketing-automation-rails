@@ -15,11 +15,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def send_welcome_email
-    # Tell the UserMailer to send a welcome email
-    UserMailer.welcome_email(self).deliver_now
-  end
-
   def prepare_timeline
     timeline = Array.new
     # combine all events and messages to one array

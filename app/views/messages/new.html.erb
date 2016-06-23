@@ -1,7 +1,14 @@
+
+
 <%= form_for @message, url: {action: "create"} do |f| %>
-  <p><%= f.text_field :from_name %></p>
-  <%= f.text_field :from_email %>
-  <%= f.text_field :subject %>
-  <p><%= f.text_area :content %></p>
+  <p>From: <%= f.text_field :from_name %></p>
+  <p>From email: <%= f.text_field :from_email %></p>
+  <p>Subject: <%= f.text_field :subject %></p>
+  <p>Content</p>
+  <p><%= f.text_area :content, class: "tinymce", rows: 40, cols: 120 %></p>
   <%= f.submit "Create" %>
 <% end %>
+
+<!-- Load and initialize TinyMCE -->
+<%= tinymce_assets %>
+<%= tinymce %>

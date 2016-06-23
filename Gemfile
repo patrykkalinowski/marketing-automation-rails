@@ -41,6 +41,9 @@ gem 'activeuuid', '>= 0.5.0'
 # Ahoy for emails
 gem 'ahoy_email'
 
+# TinyMCE for messages
+gem 'tinymce-rails'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'

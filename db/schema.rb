@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160623153635) do
+ActiveRecord::Schema.define(version: 20160623161729) do
 
   create_table "ahoy_events", force: :cascade do |t|
     t.integer  "visit_id"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20160623153635) do
     t.datetime "sent_at"
     t.datetime "opened_at"
     t.datetime "clicked_at"
+    t.integer  "message_id"
   end
 
   add_index "ahoy_messages", ["token"], name: "index_ahoy_messages_on_token"
