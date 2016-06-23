@@ -7,7 +7,7 @@
 <h1>Contact details: <%= @user.identity %> (<%= @user.email %>)</h1>
 <p>Find me in app/views/users/dashboard.html.erb</p>
 
-<%= @timeline.inspect.to_yaml %>
+<%= @timeline.inspect %>
 <hr/>
 <% @timeline.each do |item| %>
   <p><%= item[:time] %>: <%= @user.identity %> <%= item[:action] %> <a href="<%= item[:url] %>"><%= item[:title] %></a></p>

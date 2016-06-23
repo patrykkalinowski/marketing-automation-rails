@@ -23,8 +23,7 @@ class User < ActiveRecord::Base
   def prepare_timeline
     timeline = Array.new
     # combine all events and messages to one array
-    timeline.concat(messages).concat(events)
-
+    timeline = messages + events
     # sort all events in timeline by time descending
     sorted_timeline = timeline.sort_by { |key| key['time'] }.reverse
   end
@@ -41,9 +40,9 @@ class User < ActiveRecord::Base
         url: event.properties['url'],
         time: event.time
         }
-      end
+    end
 
-      events_array
+    events_array
   end
 
   def messages
@@ -53,7 +52,7 @@ class User < ActiveRecord::Base
 
     messages.each do |message|
       messages_array << {
-        action: "was delivered message",
+        action: "was sent message",
         title: message.subject,
         url: nil,
         time: message.sent_at
