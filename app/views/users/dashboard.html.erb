@@ -9,5 +9,14 @@
 
 Events:
 <% @user_events.each do |event| %>
-<p><%= current_user.identity %>: <%= event.name %> <a href="<%= event.properties['url'] %>"><%= event.properties['title']%></a> on <%= event.time %></p>
+<p><%= @user.identity %>: <%= event.name %> <a href="<%= event.properties['url'] %>"><%= event.properties['title']%></a> on <%= event.time %></p>
+<% end %>
+
+Messages:
+<% @user_messages.each do |message| %>
+  <p>
+    <%= @user.identity %>: was sent an email:
+    <%= message.subject %> on
+    <%= message.sent_at %>
+    <%= message.opened_at ? ", opened at #{message.opened_at}" : nil %> </p>
 <% end %>

@@ -6,5 +6,6 @@ class UsersController < ApplicationController
   def dashboard
     @user = User.find params[:id]
     @user_events = Ahoy::Event.where(user_id: @user).reverse_order
+    @user_messages = Ahoy::Message.where(user_id: @user).reverse_order
   end
 end
