@@ -5,6 +5,7 @@ class MessagesController < ApplicationController
 
   def show
     @message = Message.find params[:id]
+    @send_results = Ahoy::Message.where message_id: params[:id]
   end
 
   def edit

@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
       messages_array << {
         action: "was sent message",
         title: message.subject,
-        url: nil,
+        url: "http://localhost:3000/messages/#{message.message_id}",
         time: message.sent_at
       }
 

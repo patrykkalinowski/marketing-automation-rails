@@ -5,3 +5,28 @@
 <p>Subject: <%= @message.subject %></p>
 <p>Preview:</p>
 <%= raw @message.content %>
+<hr/>
+<table>
+  <tr>
+    <th>Recipient</th>
+    <th>Sent at</th>
+    <th>Opened at</th>
+    <th>Clicked at</th>
+  </tr>
+  <% @send_results.each do |msg| %>
+    <tr>
+      <td>
+        <%= msg.to %>
+      </td>
+      <td>
+        <%= msg.sent_at %>
+      </td>
+      <td>
+        <%= msg.opened_at %>
+      </td>
+      <td>
+        <%= msg.clicked_at %>
+      </td>
+    </tr>
+    <% end %>
+  </table>
