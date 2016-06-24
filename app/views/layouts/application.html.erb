@@ -11,7 +11,9 @@
   <p class="notice"><%= notice %></p>
   <p class="alert"><%= alert %></p>
 
-  <p>Current user: <%= current_user.identity %></p>
+  <% if current_user %>
+    <p>Current user: <%= current_user.identity %></p>
+  <% end %>
   
 <%= yield %>
 
