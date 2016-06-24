@@ -4,6 +4,7 @@ class UserMailer < ApplicationMailer
   def basic_email(recipient, message)
     @recipient = recipient
     @message = message
+    track extra: { message_id: message.id }
     mail(
       from: %("#{message.from_name}" <#{message.from_email}>),
       to: recipient.email,
