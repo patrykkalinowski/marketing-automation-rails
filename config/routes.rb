@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :leads, :messages
+  resources :leads, :messages, :segments
 
   get 'users/index'
 

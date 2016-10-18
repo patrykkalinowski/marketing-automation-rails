@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
 
   has_many :visits
+  has_and_belongs_to_many :segments
 
   # display name if known, else use e-mail address
   def identity

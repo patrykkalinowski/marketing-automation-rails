@@ -1,0 +1,8 @@
+{ rule: {
+    type: '$view',
+    properties: {
+      url: 'messages',
+      match: 'contains',
+    }
+    include: true,
+}
