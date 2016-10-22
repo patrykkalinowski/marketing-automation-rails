@@ -1,6 +1,67 @@
 class Segment < ActiveRecord::Base
-  serialize :rules
+  serialize :filters
   has_and_belongs_to_many :users
+
+
+  def self.example
+    # segment has many filters
+    # filters have many rules
+    # rules have many hashes of parameters (type, url, title etc)
+    # serialize filters
+
+    # example filter for "visited /messages AND /homepage OR /home/visits"
+    filter = [
+      [
+        { name: "$view",
+          properties: {
+            page: '/messages',
+          }
+        }, # AND
+        { name: "$view",
+          properties: {
+            page: '/',
+          }
+        }
+      ], # OR
+      [
+        { name: "$view",
+          properties: {
+            page: '/home/visits',
+          }
+        }
+      ]
+    ]
+
+    seg = Segment.find 1
+    seg.filters = filter
+    seg.save
+  end
+
+  def self.update
+    seg = Segment.find 1
+    users_to_add = Array.new
+    events = Ahoy::Event.all
+
+    seg.filters.each do |filter|
+      # if all conditions true, add user to segment
+      conditions = Array.new
+      filter.each do |rule|
+        puts "Events meeting rule #{rule}: ".green
+        events.each do |event|
+          # event_properties = Ahoy::Event.find(10).properties.symbolize_keys
+          # rule_properties = Segment.find(1).filters[1].first[:properties]
+          # event_properties.merge(rule_properties) == event_properties
+          if event.name == rule[:name] && event.properties.symbolize_keys.merge(rule[:properties]) == event.properties.symbolize_keys
+            puts "Meets rules. #{event.name} #{event.properties}"
+          else
+            puts "NOT! #{event.name} #{event.properties}"
+          end
+        end
+      end
+    end
+
+
+  end
 
   def self.time
     # check if event is newer than last segment update

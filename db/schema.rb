@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161018205648) do
+ActiveRecord::Schema.define(version: 20161022073025) do
 
   create_table "ahoy_events", force: :cascade do |t|
     t.integer  "visit_id"
@@ -60,7 +60,7 @@ ActiveRecord::Schema.define(version: 20161018205648) do
   end
 
   create_table "segments", force: :cascade do |t|
-    t.text     "rules"
+    t.text     "filters"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
