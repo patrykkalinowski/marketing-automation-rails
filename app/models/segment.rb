@@ -13,89 +13,139 @@ class Segment < ActiveRecord::Base
     filter = [
       [
         { name: "$view",
+          match: "^", # use different name - maybe match? # - exact match, ~ - contains, $ - ends with, ! - is not (exact match), ^ - begins with, !$ - does not end with, !^ - does not begin with, !~ - does not contain
           properties: {
             page: '/messages',
           }
         }, # AND
         { name: "$view",
+          match: "$",
           properties: {
-            page: '/',
+            page: '1',
           }
         }
       ], # OR
       [
         { name: "$view",
+          match: "!",
           properties: {
-            page: '/home/visits',
+            page: '/messages/1',
+          }
+        }
+      ], # OR
+      [
+        { name: "$view",
+          match: "~",
+          properties: {
+            url: 'param=test',
           }
         }
       ]
     ]
 
-    seg = Segment.find 1
+    seg = Segment.new
     seg.filters = filter
     seg.save
   end
 
-  def self.update
-    seg = Segment.find 1
-    users_to_add = Array.new
-    events = Ahoy::Event.all
+  def self.check_requirements(event, rule, key, value)
+    event_properties = event.properties.symbolize_keys
+    # returns true if rules are passed
+    if rule[:match] === "#"
+      event_properties[key] == (value)
+    elsif rule[:match] === "^"
+      event_properties[key].start_with?(value)
+    elsif rule[:match] === "~"
+      event_properties[key].include?(value)
+    elsif rule[:match] === "$"
+      event_properties[key].end_with?(value)
+    elsif rule[:match] === "!="
+      event_properties[key] != (value)
+    elsif rule[:match] === "!$"
+      !event_properties[key].end_with?(value)
+    elsif rule[:match] === "!^"
+      !event_properties[key].start_with?(value)
+    elsif rule[:match] === "!~"
+      !event_properties[key].include?(value)
+    else
+      # TODO: log error
+      return false
+    end
+  end
 
-    seg.filters.each do |filter|
-      # if all conditions true, add user to segment
-      conditions = Array.new
-      filter.each do |rule|
-        puts "Events meeting rule #{rule}: ".green
-        events.each do |event|
-          # event_properties = Ahoy::Event.find(10).properties.symbolize_keys
-          # rule_properties = Segment.find(1).filters[1].first[:properties]
-          # event_properties.merge(rule_properties) == event_properties
-          if event.name == rule[:name] && event.properties.symbolize_keys.merge(rule[:properties]) == event.properties.symbolize_keys
-            puts "Meets rules. #{event.name} #{event.properties}"
-          else
-            puts "NOT! #{event.name} #{event.properties}"
+  def self.update_all_emails
+    # TODO
+  end
+
+  def self.update_all_events
+    # update all segments based on all events
+    events = Ahoy::Event.where.not(user_id: nil)
+    segments = Segment.all
+
+
+
+    segments.each do |segment|
+      # contains at least one "true" if contact should be added to segment
+      # if contains only "false", contact should be removed from segment
+      passed_filters = Array.new
+      user_filters = Array.new
+      users_to_add = Array.new
+
+      # TODO: right now, user is added/removed from segment for each event, which causes hundreds unnecessary database calls
+      # find a way to check segment requirements for all scanned events once and use only 1 database call to add/remove from segment
+
+      passed_at_least_one_filter = false
+      events.each do |event|
+
+        segment.filters.each do |rules|
+          rules.each do |rule|
+              # contains only "true" if set of rules has been passed (which means at least whole one filter has been passed)
+              passed_rules = Array.new
+
+              rule[:properties].each { |key, value|
+                if Segment.check_requirements(event, rule, key, value)
+                  # rule property has been passed
+                  passed_rules << true
+                else
+                  passed_rules << false
+                end
+              }
+
+              unless passed_rules.include?(false)
+                # if all rule properties are passed, whole rule has been passed and contact meets requirements to be added to segment
+                passed_at_least_one_filter = true
+              end
           end
         end
+
+        if passed_at_least_one_filter
+
+          users_to_add << event.user_id
+          # segment.users << User.find(event.user_id)
+        else
+          # segment.users.delete(User.find(event.user_id))
+        end
+
       end
-    end
-
-
-  end
-
-  def self.time
-    # check if event is newer than last segment update
-    last_update = Time.zone.now - 14.day
-
-    events = Ahoy::Event.all
-
-    events.each do |event|
-      puts event.time
-      puts event.time.between?(last_update, Time.zone.now)
-      puts "---"
-    end
-  end
-
-  def self.update_segments
-    last_update = Time.zone.now - 300.day
-    puts last_update..Time.zone.now
-    new_events = Ahoy::Event.where(time: last_update..Time.zone.now)
-    # segments = Segment.find 6
-    seg = Segment.find 6
-
-    new_events.find_each do |event|
-      # segments.find_each do |segment|
-        if event.name == seg.rules[:rule][:type] && seg.rules[:rule][:properties][:page] == event.properties['page']
-        # self.users << event.user_id
-        seg.users << User.find(event.user_id)
+      users_to_add.uniq.each do |id|
+        user = User.find id
+        unless segment.users.exists?(user.id)
+          puts "adding user #{id} to segment #{segment.id}".green
+          segment.users << user
+        else
+          puts "user #{id} exists in segment #{segment.id}, not adding".yellow
+        end
       end
+
+      # remove from segment users which are not present in users_to_add array
+      puts "deleting users from segment #{segment.id}".red
+      segment.users.where.not(id: users_to_add.uniq).delete_all
     end
-
   end
 
-  def type
-    type = self.rules[:rule][:type]
-  end
+
+
+
 
 
 end
