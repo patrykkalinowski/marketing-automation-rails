@@ -82,43 +82,8 @@ class Segment < ActiveRecord::Base
     segments = Segment.all
 
     segments.each do |segment|
-      # if contact is eligible to join segment, this will change to true
-      passed_at_least_one_filter = false
       # user ids to add to this segment
-      users_to_add = Array.new
-
-      # iterate over all Ahoy events
-      events.each do |event|
-        # iterate over all filters and rules of current segment in loop
-        segment.filters.each do |filter|
-          filter.each do |rule|
-              # contains only "true" if set of rules in current filter passed (which means current event passed current filter)
-              passed_rules = Array.new
-
-              # iterate over each rule in current's loop filter
-              rule[:properties].each { |key, value|
-                if Segment.check_requirements(event, rule, key, value)
-                  # rule property passed
-                  passed_rules << true
-                else
-                  # rule did not pass (and filter did not pass)
-                  passed_rules << false
-                end
-              }
-
-              unless passed_rules.include?(false)
-                # if all rules passed, filter passed and contact meets requirements to be added to segment
-                passed_at_least_one_filter = true
-              end
-          end
-        end
-
-        if passed_at_least_one_filter
-          # user attached to current event meets segment requirements and will be added to current's loop segment
-          users_to_add << event.user_id
-        end
-
-      end
+      users_to_add = segment.iterate_over_events(events)
 
       segment.add_remove_users(users_to_add)
     end
@@ -128,9 +93,14 @@ class Segment < ActiveRecord::Base
   def add_remove_users(users_to_add)
     users_to_add.uniq.each do |id|
       unless self.users.exists?(id)
-        # add user to segment only if not in segment yet
-        puts "adding user #{id} to segment #{self.id}".green
-        self.users << User.find(id)
+        user = User.find_by_id(id)
+        if user
+          # add user to segment only if not in segment yet
+          puts "adding user #{id} to segment #{self.id}".green
+          self.users << User.find_by_id(id)
+        else
+          puts "user #{id} not found".yellow
+        end
       else
         puts "user #{id} exists in segment #{self.id}, not adding".yellow
       end
@@ -139,6 +109,49 @@ class Segment < ActiveRecord::Base
     # remove users which are not present in users_to_add array, which means they don't meet requirements
     puts "deleting users from segment #{self.id}".red
     self.users.where.not(id: users_to_add.uniq).delete_all
+  end
+
+  def iterate_over_events(events)
+    users_to_add = Array.new
+    # if contact is eligible to join segment, this will change to true
+
+    # iterate over all Ahoy events
+    events.each do |event|
+      passed_at_least_one_filter = false
+
+      unless passed_at_least_one_filter
+        # iterate over all filters and rules of current segment in loop
+        self.filters.each do |filter|
+          filter.each do |rule|
+            # contains only "true" if set of rules in current filter passed (which means current event passed current filter)
+            passed_rules = Array.new
+
+            # iterate over each rule in current's loop filter
+            rule[:properties].each { |key, value|
+              passed_rules << Segment.check_requirements(event, rule, key, value)
+            }
+
+            unless passed_rules.include?(false)
+              # if all rules passed, filter passed and contact meets requirements to be added to segment
+              passed_at_least_one_filter = true
+            end
+          end
+        end
+      end
+
+      if passed_at_least_one_filter
+        # user attached to current event meets segment requirements and will be added to current's loop segment
+        users_to_add << event.user_id
+      end
+
+    end
+
+    # return array of users to add to segment
+    users_to_add
+
+  end
+
+
   end
 
 

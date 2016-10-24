@@ -1,26 +1,28 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title><%= yield(:title).empty? ? "Marketing Automation Rails" : yield(:title) %></title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <p class="notice"><%= notice %></p>
-  <p class="alert"><%= alert %></p>
+    <title><%= content_for?(:title) ? yield(:title) : "Automation" %></title>
 
-  <% if current_user %>
-    <p>Current user: <%= current_user.identity %></p>
-  <% end %>
-  
-<%= yield %>
+    <%= stylesheet_link_tag    "application" %>
+    <%= javascript_include_tag "application", 'data-turbolinks-track' => true %>
+    <%= csrf_meta_tags %>
+  </head>
+
+  <body>
+    <div class="row">
+      <div class="small-12 large-12 columns">
+
+        <%= yield %>
+
+      </div>
+    </div>
 
 
-<script>
-ahoy.trackView();
-</script>
-
-</body>
+    <script>
+      ahoy.trackAll();
+    </script>
+  </body>
 </html>
