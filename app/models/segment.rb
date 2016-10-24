@@ -9,11 +9,10 @@ class Segment < ActiveRecord::Base
     # rules have many hashes of parameters (type, url, title etc)
     # serialize filters
 
-    # example filter for "visited /messages AND /homepage OR /home/visits"
-    filter = [
+    filters = [
       [
         { name: "$view",
-          match: "^", # use different name - maybe match? # - exact match, ~ - contains, $ - ends with, ! - is not (exact match), ^ - begins with, !$ - does not end with, !^ - does not begin with, !~ - does not contain
+          match: "^",
           properties: {
             page: '/messages',
           }
@@ -43,31 +42,31 @@ class Segment < ActiveRecord::Base
       ]
     ]
 
-    seg = Segment.new
-    seg.filters = filter
-    seg.save
+    Segment.create(filters: filters)
   end
 
   def self.check_requirements(event, rule, key, value)
-    event_properties = event.properties.symbolize_keys
-    # returns true if rules are passed
-    if rule[:match] === "#"
+    event_properties = event.properties.symbolize_keys # symbolize keys for hash comparison
+
+    # returns true if rule passed
+    if rule[:match] === "#" # exact match
       event_properties[key] == (value)
-    elsif rule[:match] === "^"
+    elsif rule[:match] === "^" # begins with
       event_properties[key].start_with?(value)
-    elsif rule[:match] === "~"
+    elsif rule[:match] === "~" # includes
       event_properties[key].include?(value)
-    elsif rule[:match] === "$"
+    elsif rule[:match] === "$" # starts with
       event_properties[key].end_with?(value)
-    elsif rule[:match] === "!="
+    elsif rule[:match] === "!=" # does not match
       event_properties[key] != (value)
-    elsif rule[:match] === "!$"
-      !event_properties[key].end_with?(value)
-    elsif rule[:match] === "!^"
+    elsif rule[:match] === "!^" # does not start with
       !event_properties[key].start_with?(value)
-    elsif rule[:match] === "!~"
+    elsif rule[:match] === "!~" # does not contain
       !event_properties[key].include?(value)
+    elsif rule[:match] === "!$" # does not end with
+      !event_properties[key].end_with?(value)
     else
+      # return false if rule not found
       # TODO: log error
       return false
     end
@@ -82,69 +81,65 @@ class Segment < ActiveRecord::Base
     events = Ahoy::Event.where.not(user_id: nil)
     segments = Segment.all
 
-
-
     segments.each do |segment|
-      # contains at least one "true" if contact should be added to segment
-      # if contains only "false", contact should be removed from segment
-      passed_filters = Array.new
-      user_filters = Array.new
+      # if contact is eligible to join segment, this will change to true
+      passed_at_least_one_filter = false
+      # user ids to add to this segment
       users_to_add = Array.new
 
-      # TODO: right now, user is added/removed from segment for each event, which causes hundreds unnecessary database calls
-      # find a way to check segment requirements for all scanned events once and use only 1 database call to add/remove from segment
-
-      passed_at_least_one_filter = false
+      # iterate over all Ahoy events
       events.each do |event|
-
-        segment.filters.each do |rules|
-          rules.each do |rule|
-              # contains only "true" if set of rules has been passed (which means at least whole one filter has been passed)
+        # iterate over all filters and rules of current segment in loop
+        segment.filters.each do |filter|
+          filter.each do |rule|
+              # contains only "true" if set of rules in current filter passed (which means current event passed current filter)
               passed_rules = Array.new
 
+              # iterate over each rule in current's loop filter
               rule[:properties].each { |key, value|
                 if Segment.check_requirements(event, rule, key, value)
-                  # rule property has been passed
+                  # rule property passed
                   passed_rules << true
                 else
+                  # rule did not pass (and filter did not pass)
                   passed_rules << false
                 end
               }
 
               unless passed_rules.include?(false)
-                # if all rule properties are passed, whole rule has been passed and contact meets requirements to be added to segment
+                # if all rules passed, filter passed and contact meets requirements to be added to segment
                 passed_at_least_one_filter = true
               end
           end
         end
 
         if passed_at_least_one_filter
-
+          # user attached to current event meets segment requirements and will be added to current's loop segment
           users_to_add << event.user_id
-          # segment.users << User.find(event.user_id)
-        else
-          # segment.users.delete(User.find(event.user_id))
         end
 
       end
-      users_to_add.uniq.each do |id|
-        user = User.find id
-        unless segment.users.exists?(user.id)
-          puts "adding user #{id} to segment #{segment.id}".green
-          segment.users << user
-        else
-          puts "user #{id} exists in segment #{segment.id}, not adding".yellow
-        end
-      end
 
-      # remove from segment users which are not present in users_to_add array
-      puts "deleting users from segment #{segment.id}".red
-      segment.users.where.not(id: users_to_add.uniq).delete_all
+      segment.add_remove_users(users_to_add)
     end
   end
 
+  # add users to segment from users_to_add array, remove not included from segment
+  def add_remove_users(users_to_add)
+    users_to_add.uniq.each do |id|
+      unless self.users.exists?(id)
+        # add user to segment only if not in segment yet
+        puts "adding user #{id} to segment #{self.id}".green
+        self.users << User.find(id)
+      else
+        puts "user #{id} exists in segment #{self.id}, not adding".yellow
+      end
+    end
 
-
+    # remove users which are not present in users_to_add array, which means they don't meet requirements
+    puts "deleting users from segment #{self.id}".red
+    self.users.where.not(id: users_to_add.uniq).delete_all
+  end
 
 
 
