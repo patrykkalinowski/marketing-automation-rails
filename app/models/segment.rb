@@ -146,20 +146,23 @@ class Segment < ActiveRecord::Base
         }
       end
 
-      # array of user_ids passing filter
-      filter_array = Array.new
-
-      # find user_ids present in all subarrays (meeting all rules)
-      all_rules_user_ids.each_with_index { |arr, index|
-        if index < all_rules_user_ids.size-1
-          filter_array = all_rules_user_ids[index] & all_rules_user_ids[index+1]
-          puts "Bigger array for index #{index}: #{filter_array.inspect}"
-        end
-      }
-
-      users_to_add += filter_array
+      users_to_add += Segment.users_passing_filter(all_rules_user_ids)
     end
 
     users_to_add
+  end
+
+  def self.users_passing_filter(all_rules_user_ids)
+    # array of user_ids passing filter
+    filter_array = Array.new
+
+    # find user_ids present in all subarrays (meeting all rules)
+    all_rules_user_ids.each_with_index { |arr, index|
+      if index < all_rules_user_ids.size-1
+        filter_array = all_rules_user_ids[index] & all_rules_user_ids[index+1]
+      end
+    }
+
+    filter_array
   end
 end
