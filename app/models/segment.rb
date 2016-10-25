@@ -76,6 +76,14 @@ class Segment < ActiveRecord::Base
     # TODO
   end
 
+  def update
+    events = Ahoy::Event.where.not(user_id: nil)
+
+    users_to_add = self.iterate_over_events(events)
+
+    self.add_remove_users(users_to_add)
+  end
+
   def self.update_all_events
     # update all segments based on all events
     events = Ahoy::Event.where.not(user_id: nil)
@@ -113,47 +121,45 @@ class Segment < ActiveRecord::Base
 
   def iterate_over_events(events)
     users_to_add = Array.new
-    # if contact is eligible to join segment, this will change to true
 
-    # iterate over all Ahoy events
-    events.each do |event|
-      passed_at_least_one_filter = false
+    # iterate over all filters and rules of current segment in loop
+    self.filters.each do |filter|
 
-      unless passed_at_least_one_filter
-        # iterate over all filters and rules of current segment in loop
-        self.filters.each do |filter|
-          filter.each do |rule|
-            # contains only "true" if set of rules in current filter passed (which means current event passed current filter)
-            passed_rules = Array.new
+      # [ [ rule1_user_ids ], [ rule2_user_ids ], [ ruleN_user_ids ]]
+      # user_id must be present in every rule subarray to pass filter
+      all_rules_user_ids = Array.new
 
-            # iterate over each rule in current's loop filter
-            rule[:properties].each { |key, value|
-              passed_rules << Segment.check_requirements(event, rule, key, value)
-            }
+      filter.each do |rule|
+        # iterate over each rule in current's loop filter
+        rule[:properties].each { |key, value|
+          rule_user_ids = Array.new
 
-            unless passed_rules.include?(false)
-              # if all rules passed, filter passed and contact meets requirements to be added to segment
-              passed_at_least_one_filter = true
+          events.each do |event|
+            if Segment.check_requirements(event, rule, key, value)
+              # save user_id from event passing rule
+              rule_user_ids << event.user_id
             end
           end
+
+          # [ [ rule1_user_ids ], [ rule2_user_ids ], [ ruleN_user_ids ]]
+          all_rules_user_ids << rule_user_ids.uniq
+        }
+      end
+
+      # array of user_ids passing filter
+      filter_array = Array.new
+
+      # find user_ids present in all subarrays (meeting all rules)
+      all_rules_user_ids.each_with_index { |arr, index|
+        if index < all_rules_user_ids.size-1
+          filter_array = all_rules_user_ids[index] & all_rules_user_ids[index+1]
+          puts "Bigger array for index #{index}: #{filter_array.inspect}"
         end
-      end
+      }
 
-      if passed_at_least_one_filter
-        # user attached to current event meets segment requirements and will be added to current's loop segment
-        users_to_add << event.user_id
-      end
-
+      users_to_add += filter_array
     end
 
-    # return array of users to add to segment
     users_to_add
-
   end
-
-
-  end
-
-
-
 end

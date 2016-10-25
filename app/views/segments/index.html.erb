@@ -1,0 +1,18 @@
+<% @segments.each do |segment| %>
+  <h1>Segment <%= segment.id %></h1>
+  <p>Filters:</p>
+  <% segment.filters.each do |filter| %>
+    <div class="small-5 callout">
+      <% filter.each do |rule| %>
+        <div class="callout">
+          <p><%= rule[:name] %></p>
+          <p><%= rule[:match] %></p>
+          <p><%= rule[:properties] %></p>
+        </div>
+      <% end %>
+    </div>
+    <p>OR</p>
+  <% end %>
+
+
+<% end %>
