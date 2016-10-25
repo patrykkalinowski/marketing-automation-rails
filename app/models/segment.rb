@@ -39,6 +39,21 @@ class Segment < ActiveRecord::Base
             url: 'param=test',
           }
         }
+      ], # OR
+      [
+        { name: "$email",
+          match: "~",
+          properties: {
+            subject: "Example Message"
+          },
+        }, # AND
+        {
+          name: "$email",
+          match: "#",
+          properties: {
+            to: "patryk.kalinowski"
+          }
+        }
       ]
     ]
 
@@ -50,21 +65,21 @@ class Segment < ActiveRecord::Base
 
     # returns true if rule passed
     if rule[:match] === "#" # exact match
-      event_properties[key] == (value)
+      event_properties[key].downcase == (value.downcase)
     elsif rule[:match] === "^" # begins with
-      event_properties[key].start_with?(value)
+      event_properties[key].downcase.start_with?(value.downcase)
     elsif rule[:match] === "~" # includes
-      event_properties[key].include?(value)
+      event_properties[key].downcase.include?(value.downcase)
     elsif rule[:match] === "$" # starts with
-      event_properties[key].end_with?(value)
+      event_properties[key].downcase.end_with?(value.downcase)
     elsif rule[:match] === "!=" # does not match
-      event_properties[key] != (value)
+      event_properties[key].downcase != (value.downcase)
     elsif rule[:match] === "!^" # does not start with
-      !event_properties[key].start_with?(value)
+      !event_properties[key].downcase.start_with?(value.downcase)
     elsif rule[:match] === "!~" # does not contain
-      !event_properties[key].include?(value)
+      !event_properties[key].downcase.include?(value.downcase)
     elsif rule[:match] === "!$" # does not end with
-      !event_properties[key].end_with?(value)
+      !event_properties[key].downcase.end_with?(value.downcase)
     else
       # return false if rule not found
       # TODO: log error
