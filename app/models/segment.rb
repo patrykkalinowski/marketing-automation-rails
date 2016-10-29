@@ -80,6 +80,10 @@ class Segment < ActiveRecord::Base
       !event_properties[key].downcase.include?(value.downcase)
     elsif rule[:match] === "!$" # does not end with
       !event_properties[key].downcase.end_with?(value.downcase)
+    elsif rule[:match] === "empty" # is empty
+      event_properties[key].empty?
+    elsif rule[:match] === "!empty" # is not empty
+      !event_properties[key].empty?
     else
       # return false if rule not found
       # TODO: log error

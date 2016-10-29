@@ -20,4 +20,20 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  segments:
+    filters:
+      names:
+        $view: "EN Viewed page"
+      matches:
+        '~': "contains"
+        '$': "ends with"
+        '!': "is not"
+        '^': "begins with"
+        '!$': "does not end with"
+        '!^': "does not start with"
+        '#': "is"
+        'empty': "is empty"
+        '!empty': "is not empty"
+      properties:
+        page: "path"
+        url: "URL"

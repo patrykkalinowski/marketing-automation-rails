@@ -1,1 +1,33 @@
-<h1>Segment with id=<%= @segment.id %>
+<h1>Segment <%= @segment.id %></h1>
+
+<div class="row">
+  <div class="small-2 large-4 columns">
+    <h2>Filters:</h2>
+      <% @segment.filters.each do |filter| %>
+        <div class="small-12 callout">
+          <% filter.each do |rule| %>
+            <div class="callout">
+              <p>options_for_select: NAME</p>
+              <%= options_for_select(@options_for_select_name) %>
+
+              <hr/>
+              <p>Options for select: MATCH</p>
+              <%= options_for_select(@options_for_select_match) %>
+
+              <hr/>
+              <p>options_for_select: PROPERTY</p>
+              <%= options_for_select(@options_for_select_property) %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+  </div>
+  <div class="small-4 large-4 columns">
+    <h2>Users in segment:</h2>
+    <% @segment.users.each do |user| %>
+      <div class="callout">
+        <p><%= "#{user.id}: #{user.identity} (#{user.email})" %></p>
+      </div>
+    <% end %>
+  </div>
+</div

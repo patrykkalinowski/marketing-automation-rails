@@ -1,5 +1,5 @@
 <% @segments.each do |segment| %>
-  <h1>Segment <%= segment.id %></h1>
+  <h1><%= link_to "Segment #{segment.id}", segment_path(segment) %></h1>
   <p>Filters:</p>
   <% segment.filters.each do |filter| %>
     <div class="small-5 callout">
