@@ -2,88 +2,42 @@ class Segment < ActiveRecord::Base
   serialize :filters
   has_and_belongs_to_many :users
 
+  def update
+    events = Ahoy::Event.where.not(user_id: nil)
+    users = User.all
+    emails = Ahoy::Message.all
 
-  def self.example
-    # segment has many filters
-    # filters have many rules
-    # rules have many hashes of parameters (type, url, title etc)
-    # serialize filters
+    users_to_add = self.iterate_over(events, emails, users)
 
-    filters = [
-      [
-        { name: "$view",
-          match: "^",
-          properties: {
-            page: '/messages',
-          }
-        }, # AND
-        { name: "$view",
-          match: "$",
-          properties: {
-            page: '1',
-          }
-        }
-      ], # OR
-      [
-        { name: "$view",
-          match: "!",
-          properties: {
-            page: '/messages/1',
-          }
-        }
-      ], # OR
-      [
-        { name: "$view",
-          match: "~",
-          properties: {
-            url: 'param=test',
-          }
-        }
-      ], # OR
-      [
-        { name: "$email",
-          match: "~",
-          properties: {
-            subject: "Example Message"
-          },
-        }, # AND
-        {
-          name: "$email",
-          match: "#",
-          properties: {
-            to: "patryk.kalinowski"
-          }
-        }
-      ]
-    ]
-
-    Segment.create(filters: filters)
+    self.add_remove_users(users_to_add)
   end
 
   def self.check_requirements(event, rule, key, value)
-    event_properties = event.properties.symbolize_keys # symbolize keys for hash comparison
+    # if rule is for events, event data is in properties
+    if rule[:name] == "$event"
+      event = event.properties.symbolize_keys
 
     # returns true if rule passed
     if rule[:match] === "#" # exact match
-      event_properties[key].downcase == (value.downcase)
+      event[key].downcase == (value.downcase)
     elsif rule[:match] === "^" # begins with
-      event_properties[key].downcase.start_with?(value.downcase)
+      event[key].downcase.start_with?(value.downcase)
     elsif rule[:match] === "~" # includes
-      event_properties[key].downcase.include?(value.downcase)
+      event[key].downcase.include?(value.downcase)
     elsif rule[:match] === "$" # starts with
-      event_properties[key].downcase.end_with?(value.downcase)
+      event[key].downcase.end_with?(value.downcase)
     elsif rule[:match] === "!=" # does not match
-      event_properties[key].downcase != (value.downcase)
+      event[key].downcase != (value.downcase)
     elsif rule[:match] === "!^" # does not start with
-      !event_properties[key].downcase.start_with?(value.downcase)
+      !event[key].downcase.start_with?(value.downcase)
     elsif rule[:match] === "!~" # does not contain
-      !event_properties[key].downcase.include?(value.downcase)
+      !event[key].downcase.include?(value.downcase)
     elsif rule[:match] === "!$" # does not end with
-      !event_properties[key].downcase.end_with?(value.downcase)
+      !event[key].downcase.end_with?(value.downcase)
     elsif rule[:match] === "empty" # is empty
-      event_properties[key].empty?
+      event[key].empty?
     elsif rule[:match] === "!empty" # is not empty
-      !event_properties[key].empty?
+      !event[key].empty?
     else
       # return false if rule not found
       # TODO: log error
@@ -92,16 +46,18 @@ class Segment < ActiveRecord::Base
   end
 
   def self.update_all_emails
-    # TODO
+    emails = Ahoy::Message.where.not(user_id: nil)
+    segments = Segment.all
+
+    segments.each do |segment|
+      # user ids to add to this segment
+      users_to_add = segment.iterate_over_emails(emails)
+
+      segment.add_remove_users(users_to_add)
+    end
   end
 
-  def update
-    events = Ahoy::Event.where.not(user_id: nil)
 
-    users_to_add = self.iterate_over_events(events)
-
-    self.add_remove_users(users_to_add)
-  end
 
   def self.update_all_events
     # update all segments based on all events
@@ -110,7 +66,7 @@ class Segment < ActiveRecord::Base
 
     segments.each do |segment|
       # user ids to add to this segment
-      users_to_add = segment.iterate_over_events(events)
+      users_to_add = segment.iterate_over(events)
 
       segment.add_remove_users(users_to_add)
     end
@@ -171,6 +127,84 @@ class Segment < ActiveRecord::Base
     users_to_add
   end
 
+  def iterate_over_emails(emails)
+    users_to_add = Array.new
+
+    # iterate over all filters and rules of current segment in loop
+    self.filters.each do |filter|
+
+      # [ [ rule1_user_ids ], [ rule2_user_ids ], [ ruleN_user_ids ]]
+      # user_id must be present in every rule subarray to pass filter
+      all_rules_user_ids = Array.new
+
+      filter.each do |rule|
+        # iterate over each rule in current's loop filter
+        rule[:properties].each { |key, value|
+          rule_user_ids = Array.new
+
+          emails.each do |email|
+            if Segment.check_requirements_emails(email, rule, key, value)
+              # save user_id from event passing rule
+              rule_user_ids << email.user_id
+            end
+          end
+
+          # [ [ rule1_user_ids ], [ rule2_user_ids ], [ ruleN_user_ids ]]
+          all_rules_user_ids << rule_user_ids.uniq
+        }
+      end
+
+      users_to_add += Segment.users_passing_filter(all_rules_user_ids)
+    end
+
+    users_to_add
+  end
+
+  def iterate_over(events, emails, users)
+    users_to_add = Array.new
+
+    # iterate over all filters and rules of current segment in loop
+    self.filters.each do |filter|
+
+      # [ [ rule1_user_ids ], [ rule2_user_ids ], [ ruleN_user_ids ]]
+      # user_id must be present in every rule subarray to pass filter
+      all_rules_user_ids = Array.new
+
+      filter.each do |rule|
+        # iterate over each rule in current's loop filter
+        rule[:properties].each { |key, value|
+          rule_user_ids = Array.new
+
+          events.each do |event|
+            if Segment.check_requirements(event, rule, key, value)
+              # save user_id from event passing rule
+              rule_user_ids << event.user_id
+            end
+          end
+          emails.each do |email|
+            if Segment.check_requirements_emails(email, rule, key, value)
+              # save user_id from event passing rule
+              rule_user_ids << email.user_id
+            end
+          end
+          users.each do |user|
+            if Segment.check_requirements_emails(user, rule, key, value)
+              # save user_id from event passing rule
+              rule_user_ids << user.id
+            end
+          end
+
+          # [ [ rule1_user_ids ], [ rule2_user_ids ], [ ruleN_user_ids ]]
+          all_rules_user_ids << rule_user_ids.uniq
+        }
+      end
+
+      users_to_add += Segment.users_passing_filter(all_rules_user_ids)
+    end
+
+    users_to_add
+  end
+
   def self.users_passing_filter(all_rules_user_ids)
     # array of user_ids passing filter
     filter_array = Array.new
@@ -184,4 +218,63 @@ class Segment < ActiveRecord::Base
 
     filter_array
   end
+
+  def self.example
+    # segment has many filters
+    # filters have many rules
+    # rules have many hashes of parameters (type, url, title etc)
+    # serialize filters
+
+    filters = [
+      [
+        { name: "$view",
+          match: "^",
+          properties: {
+            page: '/messages',
+          }
+        }, # AND
+        { name: "$view",
+          match: "$",
+          properties: {
+            page: '1',
+          }
+        }
+      ], # OR
+      [
+        { name: "$view",
+          match: "!",
+          properties: {
+            page: '/messages/1',
+          }
+        }
+      ], # OR
+      [
+        { name: "$view",
+          match: "~",
+          properties: {
+            url: 'param=test',
+          }
+        }
+      ], # OR
+      [
+        { name: "$email",
+          match: "~",
+          properties: {
+            subject: "Example Message"
+          },
+        }, # AND
+        {
+          name: "$email",
+          match: "#",
+          properties: {
+            to: "patryk.kalinowski"
+          }
+        }
+      ]
+    ]
+
+    Segment.create(filters: filters)
+  end
+
+end
 end
