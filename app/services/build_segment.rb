@@ -15,7 +15,7 @@ class BuildSegment
   end
 
   def add_users(segment, users_to_add)
-    segment.users << users_to_add
+    segment.users << users_to_add.uniq
   end
 
   def users_meeting_requirements_for(segment)
@@ -25,33 +25,61 @@ class BuildSegment
       users << users_passing_filter(filter)
     end
 
-    users
+    users.flatten.uniq
   end
 
   def users_passing_filter(filter)
     users = Array.new
+    users_passing_filter = Array.new
 
     filter.each do |rule|
-
+      users << users_passing_rule(rule)
     end
+
+    # => users = [[rule1_users],[rule2_users]]
+    users.each_with_index { |arr, index|
+      if index < users.size-1
+        users_passing_filter = users[index] & users[index+1]
+      end
+    }
+
+    users_passing_filter
   end
 
   def users_passing_rule(rule)
+    users = Array.new
+    relation = ActiveRecord::Relation.new
 
-  end
-
-
-  def find_rules
-    user_rules = Array.new
-
-    rules.each do |rule|
-      users_rules << users_meeting_rule(rule)
+    if rule[:match] === "#" # exact match
+      relation = Ahoy::Event.where_properties(rule[:properties])
+    elsif rule[:match] === "^" # begins with
+      relation = Ahoy::Event.where.not(user_id = nil).where("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "#{rule[:properties].values.first.to_s}%")
+    elsif rule[:match] === "~" # includes
+      relation = Ahoy::Event.where.not(user_id = nil).where("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}%")
+    elsif rule[:match] === "$" # ends with
+      relation = Ahoy::Event.where.not(user_id = nil).where("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}")
+    elsif rule[:match] === "!=" # does not match
+      relation = Ahoy::Event.where.not(user_id = nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "#{rule[:properties].values.first.to_s}")
+    elsif rule[:match] === "!^" # does not start with
+      relation = Ahoy::Event.where.not(user_id = nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "#{rule[:properties].values.first.to_s}%")
+    elsif rule[:match] === "!~" # does not contain
+      relation = Ahoy::Event.where.not(user_id = nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}%")
+    elsif rule[:match] === "!$" # does not end with
+      relation = Ahoy::Event.where.not(user_id = nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}")
+    elsif rule[:match] === "empty" # is empty
+      relation = Ahoy::Event.where.not(user_id = nil).where("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "")
+    elsif rule[:match] === "!empty" # is not empty
+      relation = Ahoy::Event.where.not(user_id = nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "")
+    else
+      # return false if rule not found
+      # TODO: log error
+      return false
     end
 
-    user_rules.uniq
-  end
+    relation.each do |event|
+      users << event.user_id
+    end
 
-  def users_meeting_rule
-
+    users.uniq
   end
 end
