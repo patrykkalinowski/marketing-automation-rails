@@ -1,41 +1,6 @@
-class Segment < ActiveRecord::Base
-  serialize :filters
-  
-  has_and_belongs_to_many :users
-
-  validates :filters, presence: true
-
-  def build
-    segment_builder = BuildSegment.new(self)
-    segment_builder.call
-  end
-
-  def self.example2
-    # segment has many filters
-    # filters have many rules
-    # rules have many hashes of parameters (type, url, title etc)
-    # serialize filters
-
-    filters = [
-      [
-        { name: "$view",
-          match: "^",
-          properties: {
-            page: '/messages',
-          }
-        }, # AND
-      ]
-    ]
-
-    Segment.create(filters: filters)
-  end
-  def self.example
-    # segment has many filters
-    # filters have many rules
-    # rules have many hashes of parameters (type, url, title etc)
-    # serialize filters
-
-    filters = [
+FactoryGirl.define do
+  factory :segment do
+    filters [
       [
         { name: "$view",
           match: "^",
@@ -82,7 +47,5 @@ class Segment < ActiveRecord::Base
         }
       ]
     ]
-
-    Segment.create(filters: filters)
   end
 end
