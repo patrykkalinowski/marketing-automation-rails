@@ -1,6 +1,6 @@
 class Segment < ActiveRecord::Base
   serialize :filters
-  
+
   has_and_belongs_to_many :users
 
   validates :filters, presence: true
@@ -8,6 +8,13 @@ class Segment < ActiveRecord::Base
   def build
     segment_builder = BuildSegment.new(self)
     segment_builder.call
+  end
+
+  def self.build_all
+    Segment.all.each do |segment|
+      segment_builder = BuildSegment.new(segment)
+      segment_builder.call
+    end
   end
 
   def self.example2
