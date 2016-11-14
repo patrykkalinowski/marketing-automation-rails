@@ -59,7 +59,7 @@ group :development, :test do
   gem 'quiet_assets'
 
   gem 'rspec-rails'
-  gem 'factory_firl_rails'
+  gem 'factory_girl_rails'
 end
 
 group :development do
