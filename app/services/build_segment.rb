@@ -35,25 +35,24 @@ class BuildSegment
 
   def users_passing_filter(filter)
     users = Array.new
-    filtered_users = Array.new
+    users_to_add = Array.new
 
     filter.each do |rule|
       users << users_passing_rule(rule)
     end
+    p users
     # => users = [[rule1_users],[rule2_users]]
     if users.count == 1
-      filtered_users = users.flatten
+      users_to_add = users.flatten
     else
       users.each_with_index { |arr, index|
-        p arr
-        p index
         if index < users.size-1
-          filtered_users = users[index] & users[index+1]
+          users_to_add = users[index] & users[index+1]
         end
       }
     end
 
-    filtered_users
+    users_to_add
   end
 
   def users_passing_rule(rule)
@@ -80,9 +79,9 @@ class BuildSegment
     elsif rule[:match] === "!empty" # is not empty
       relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "")
     else
-      # return false if rule not found
+      # return no users if rule not found
       # TODO: log error
-      return false
+      return []
     end
 
     relation.each do |event|
