@@ -7,7 +7,6 @@ class BuildSegment
   def call
     users_to_add = users_meeting_requirements_for(@segment)
 
-    puts "users to add: #{users_to_add}"
     add_users(@segment, users_to_add)
     remove_users(@segment, users_to_add)
   end
@@ -19,7 +18,9 @@ class BuildSegment
   end
 
   def add_users(segment, users_to_add)
-    segment.users << users_to_add.uniq
+    users_to_add.uniq.each do |user_id|
+      segment.users << User.find(user_id)
+    end
   end
 
   def users_meeting_requirements_for(segment)
@@ -39,13 +40,18 @@ class BuildSegment
     filter.each do |rule|
       users << users_passing_rule(rule)
     end
-
     # => users = [[rule1_users],[rule2_users]]
-    users.each_with_index { |arr, index|
-      if index < users.size-1
-        filtered_users = users[index] & users[index+1]
-      end
-    }
+    if users.count == 1
+      filtered_users = users.flatten
+    else
+      users.each_with_index { |arr, index|
+        p arr
+        p index
+        if index < users.size-1
+          filtered_users = users[index] & users[index+1]
+        end
+      }
+    end
 
     filtered_users
   end
