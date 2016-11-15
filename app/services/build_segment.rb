@@ -9,6 +9,8 @@ class BuildSegment
 
     add_users(@segment, users_to_add)
     remove_users(@segment, users_to_add)
+
+    users_to_add
   end
 
   private
@@ -30,7 +32,7 @@ class BuildSegment
       users << users_passing_filter(filter)
     end
 
-    users.flatten.uniq
+    users.flatten
   end
 
   def users_passing_filter(filter)
@@ -40,8 +42,8 @@ class BuildSegment
     filter.each do |rule|
       users << users_passing_rule(rule)
     end
-    p users
-    # => users = [[rule1_users],[rule2_users]]
+
+    # users => [[rule1_users],[rule2_users]]
     if users.count == 1
       users_to_add = users.flatten
     else

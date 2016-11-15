@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :ahoy_event do
+  factory :ahoy_event, class: Ahoy::Event do
     user_id 1
     name "$view"
     properties {
@@ -24,11 +24,20 @@ FactoryGirl.define do
       }
     end
 
+    factory :ahoy_event_params_user2 do
+      user_id 2
+      properties {
+        page "/"
+        url "http://localhost:3000/?params=test"
+        title "Marketing Automation Rails"
+      }
+    end
+
     factory :ahoy_event_messages_index do
       properties {
         page "/messages"
         url "http://localhost:3000/messages"
-        title "Marketing Automation Rails Messages"
+        title "Messages"
       }
     end
 
@@ -36,7 +45,7 @@ FactoryGirl.define do
       properties {
         page "/messages/1"
         url "http://localhost:3000/messages/1"
-        title "Marketing Automation Rails Messages: 1"
+        title "Messages: 1"
       }
     end
 

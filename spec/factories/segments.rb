@@ -3,49 +3,52 @@ FactoryGirl.define do
     filters [
       [
         { name: "$view",
-          match: "^",
-          properties: {
-            page: '/messages',
-          }
-        }, # AND
-        { name: "$view",
-          match: "$",
-          properties: {
-            page: '1',
-          }
-        }
-      ], # OR
-      [
-        { name: "$view",
-          match: "!",
-          properties: {
-            page: '/messages/1',
-          }
-        }
-      ], # OR
-      [
-        { name: "$view",
           match: "~",
           properties: {
-            url: 'param=test',
-          }
-        }
-      ], # OR
-      [
-        { name: "$email",
-          match: "~",
-          properties: {
-            subject: "Example Message"
-          },
-        }, # AND
-        {
-          name: "$email",
-          match: "#",
-          properties: {
-            to: "patryk.kalinowski"
+            page: '/',
           }
         }
       ]
     ]
+
+    factory :segment_homepage_match do
+      filters [
+        [
+          { name: "$view",
+            match: "=",
+            properties: {
+              page: "/"
+            }
+          }
+        ]
+      ]
+    end
+
+    factory :segment_url_params do
+      filters [
+        [
+          { name: "$view",
+            match: "~",
+            properties: {
+              url: "params=test"
+            }
+          }
+        ]
+      ]
+    end
+
+    factory :segment_url_empty do
+      filters [
+        [
+          { name: "$view",
+            match: "empty",
+            properties: {
+              url: ""
+            }
+          }
+        ]
+      ]
+    end
+
   end
 end
