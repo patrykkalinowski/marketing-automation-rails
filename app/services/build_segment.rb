@@ -110,10 +110,12 @@ class BuildSegment
     users = Array.new
 
     if rule[:match] === "=" # exact match
-      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s}' = ?", "#{rule[:properties].values.first.to_s}")
+      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s} = ?", "#{rule[:properties].values.first.to_s}")
 
     elsif rule[:match] === "^" # begins with
-      relation = Ahoy::Event.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s}' LIKE ?", "#{rule[:properties].values.first.to_s}%")
+      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s} LIKE ?", "#{rule[:properties].values.first.to_s}%")
+    elsif rule[:match] === "~" # contains
+      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s} LIKE ?", "%#{rule[:properties].values.first.to_s}%")
     else
       relation = []
     end
@@ -121,7 +123,7 @@ class BuildSegment
     relation.each do |event|
       users << event.user_id
     end
-
+    p "users to add from messages: #{users}"
     users.uniq
   end
 end
