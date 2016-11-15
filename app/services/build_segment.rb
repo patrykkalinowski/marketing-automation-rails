@@ -20,8 +20,8 @@ class BuildSegment
   end
 
   def add_users(segment, users_to_add)
-    users_to_add.uniq.each do |user_id|
-      segment.users << User.find(user_id)
+    users_to_add.uniq.each do |user|
+      segment.users << User.find(user)
     end
   end
 
@@ -37,17 +37,24 @@ class BuildSegment
 
   def users_passing_filter(filter)
     users = Array.new
-    users_to_add = Array.new
 
     filter.each do |rule|
       if rule[:name] == "$view"
-        users << users_passing_rule(rule)
+        find_events_users = BuildSegment::FindEvents.new(rule)
+        users << find_events_users.call
       elsif rule[:name] == "$email"
-        users << users_passing_rule_message(rule)
+        find_messages_users = BuildSegment::FindMessages.new(rule)
+        users << find_messages_users.call
+      elsif rule[:name] == "$user"
+        find_users = BuildSegment::FindUsers.new(rule)
+        users << find_users.call
       end
     end
 
-    # users => [[rule1_users],[rule2_users]]
+    users_passing_all_rules(users)
+  end
+
+  def users_passing_all_rules(users)
     if users.count == 1
       users_to_add = users.flatten
     else
@@ -61,69 +68,4 @@ class BuildSegment
     users_to_add
   end
 
-  def users_passing_rule(rule)
-    users = Array.new
-
-    if rule[:match] === "=" # exact match
-      relation = Ahoy::Event.where_properties(rule[:properties])
-
-    elsif rule[:match] === "^" # begins with
-      relation = Ahoy::Event.where.not(user_id: nil).where("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "#{rule[:properties].values.first.to_s}%")
-
-    elsif rule[:match] === "~" # includes
-      relation = Ahoy::Event.where.not(user_id: nil).where("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}%")
-
-    elsif rule[:match] === "$" # ends with
-      relation = Ahoy::Event.where.not(user_id: nil).where("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}")
-
-    elsif rule[:match] === "!=" # does not match
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "#{rule[:properties].values.first.to_s}")
-
-    elsif rule[:match] === "!^" # does not start with
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "#{rule[:properties].values.first.to_s}%")
-
-    elsif rule[:match] === "!~" # does not contain
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}%")
-
-    elsif rule[:match] === "!$" # does not end with
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' LIKE ?", "%#{rule[:properties].values.first.to_s}")
-
-    elsif rule[:match] === "empty" # is empty
-      relation = Ahoy::Event.where.not(user_id: nil).where("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "")
-
-    elsif rule[:match] === "!empty" # is not empty
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{rule[:properties].keys.first.to_s}' = ?", "")
-    else
-      # return no users if rule not found
-      # TODO: log error
-      return []
-    end
-
-    relation.each do |event|
-      users << event.user_id
-    end
-
-    users.uniq
-  end
-
-  def users_passing_rule_message(rule)
-    users = Array.new
-
-    if rule[:match] === "=" # exact match
-      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s} = ?", "#{rule[:properties].values.first.to_s}")
-
-    elsif rule[:match] === "^" # begins with
-      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s} LIKE ?", "#{rule[:properties].values.first.to_s}%")
-    elsif rule[:match] === "~" # contains
-      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s} LIKE ?", "%#{rule[:properties].values.first.to_s}%")
-    else
-      relation = []
-    end
-
-    relation.each do |event|
-      users << event.user_id
-    end
-    p "users to add from messages: #{users}"
-    users.uniq
-  end
 end

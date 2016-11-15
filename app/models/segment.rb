@@ -2,7 +2,6 @@ class Segment < ActiveRecord::Base
   serialize :filters
 
   has_and_belongs_to_many :users
-
   validates :filters, presence: true
 
   def build
