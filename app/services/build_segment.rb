@@ -40,7 +40,11 @@ class BuildSegment
     users_to_add = Array.new
 
     filter.each do |rule|
-      users << users_passing_rule(rule)
+      if rule[:name] == "$view"
+        users << users_passing_rule(rule)
+      elsif rule[:name] == "$email"
+        users << users_passing_rule_message(rule)
+      end
     end
 
     # users => [[rule1_users],[rule2_users]]
@@ -93,6 +97,25 @@ class BuildSegment
       # return no users if rule not found
       # TODO: log error
       return []
+    end
+
+    relation.each do |event|
+      users << event.user_id
+    end
+
+    users.uniq
+  end
+
+  def users_passing_rule_message(rule)
+    users = Array.new
+
+    if rule[:match] === "=" # exact match
+      relation = Ahoy::Message.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s}' = ?", "#{rule[:properties].values.first.to_s}")
+
+    elsif rule[:match] === "^" # begins with
+      relation = Ahoy::Event.where.not(user_id: nil).where("#{rule[:properties].keys.first.to_s}' LIKE ?", "#{rule[:properties].values.first.to_s}%")
+    else
+      relation = []
     end
 
     relation.each do |event|
