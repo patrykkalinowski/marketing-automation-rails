@@ -48,6 +48,9 @@ class BuildSegment
       elsif rule[:name] == "$user"
         find_users = BuildSegment::FindUsers.new(rule)
         users << find_users.call
+      elsif rule[:name] == "$segment"
+        find_users = BuildSegment::FindSegments.new(rule)
+        users << find_users.call
       end
     end
 
