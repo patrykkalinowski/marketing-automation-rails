@@ -14,17 +14,17 @@ class BuildSegment::FindUsersToAdd
 
   def call
       if @rule[:name] == "$email"
-        messages = BuildSegment::FindUsersFromMessages.new(query)
-        found_users = messages.call
+        find_users_from_messages = BuildSegment::FindUsersFromMessages.new(query)
+        found_users = find_users_from_messages.call
       elsif @rule[:name] == "$view"
-        events = BuildSegment::FindUsersFromEvents.new(query)
-        found_users = events.call
+        find_users_from_events = BuildSegment::FindUsersFromEvents.new(query)
+        found_users = find_users_from_events.call
       elsif @rule[:name] == "$user"
-        users = BuildSegment::FindUsers.new(query)
-        found_users = users.call
+        find_users = BuildSegment::FindUsers.new(query)
+        found_users = find_users.call
       elsif @rule[:name] == "$segment"
-        segments = BuildSegment::FindUsersFromSegments.new(query)
-        found_users = segments.call
+        find_users_from_segments = BuildSegment::FindUsersFromSegments.new(query)
+        found_users = find_users_from_segments.call
       end
 
     found_users

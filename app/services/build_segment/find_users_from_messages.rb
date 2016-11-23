@@ -15,8 +15,8 @@ class BuildSegment::FindUsersFromMessages
 
     users = Array.new
 
-    relation.each do |event|
-      users << event.user_id
+    relation.each do |message|
+      users << message.user_id
     end
 
     users.uniq
