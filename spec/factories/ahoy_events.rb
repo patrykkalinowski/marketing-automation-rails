@@ -17,36 +17,36 @@ FactoryGirl.define do
     end
 
     factory :ahoy_event_params do
-      properties {
-        page "/"
-        url "http://localhost:3000/?params=test"
-        title "Marketing Automation Rails"
-      }
+      properties { {
+        page: "/",
+        url: "http://localhost:3000/?params=test",
+        title: "Marketing Automation Rails"
+      } }
     end
 
     factory :ahoy_event_params_user2 do
       user_id 2
-      properties {
-        page "/"
-        url "http://localhost:3000/?params=test"
-        title "Marketing Automation Rails"
-      }
+      properties { {
+        page: "/",
+        url: "http://localhost:3000/?params=test",
+        title: "Marketing Automation Rails"
+      } }
     end
 
     factory :ahoy_event_messages_index do
-      properties {
-        page "/messages"
-        url "http://localhost:3000/messages"
-        title "Messages"
-      }
+      properties { {
+        page: "/messages",
+        url: "http://localhost:3000/messages",
+        title: "Messages"
+      } }
     end
 
     factory :ahoy_event_messages_show do
-      properties {
-        page "/messages/1"
-        url "http://localhost:3000/messages/1"
-        title "Messages: 1"
-      }
+      properties { {
+        page: "/messages/1",
+        url: "http://localhost:3000/messages/1",
+        title: "Messages: 1"
+      } }
     end
 
     factory :ahoy_event_name do

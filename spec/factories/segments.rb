@@ -50,5 +50,18 @@ FactoryGirl.define do
       ]
     end
 
+    factory :segment_custom_event do
+      filters [
+        [
+          { name: "Example Event",
+            match: "empty",
+            properties: {
+              url: ""
+            }
+          }
+        ]
+      ]
+    end
+
   end
 end

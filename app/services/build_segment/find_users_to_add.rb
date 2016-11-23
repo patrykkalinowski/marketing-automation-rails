@@ -25,6 +25,8 @@ class BuildSegment::FindUsersToAdd
       elsif @rule[:name] == "$segment"
         find_users_from_segments = BuildSegment::FindUsersFromSegments.new(query)
         found_users = find_users_from_segments.call
+      else
+        return false
       end
 
     found_users
