@@ -44,7 +44,8 @@ class BuildSegment::FindUsersToAdd
 
     return {
       key: key,
-      pattern: pattern
+      pattern: pattern,
       negative: negative
     }
+  end
 end

@@ -7,7 +7,7 @@ describe BuildSegment do
   it "finds users passing filter"
   it "finds users passing rule" do
     segment = FactoryGirl.build(:segment)
-    FactoryGirl.create(:ahoy_event, class: Ahoy::Event)
+    FactoryGirl.build(:ahoy_event)
 
     segment_builder = BuildSegment.new(segment)
     expect(segment_builder.call).to eql([1])

@@ -5,7 +5,7 @@ FactoryGirl.define do
         { name: "$view",
           match: "~",
           properties: {
-            page: '/',
+            page: "/",
           }
         }
       ]

@@ -2,11 +2,11 @@ FactoryGirl.define do
   factory :ahoy_event, class: Ahoy::Event do
     user_id 1
     name "$view"
-    properties {
-      page "/"
-      url "http://localhost:3000/"
-      title "Marketing Automation Rails"
-    }
+    properties { {
+      page: "/",
+      url: "http://localhost:3000/",
+      title: "Marketing Automation Rails"
+    } }
 
     factory :ahoy_event_no_user do
       user_id nil
