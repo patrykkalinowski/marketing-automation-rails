@@ -1,7 +1,9 @@
-class BuildSegment::FindSegments
+class BuildSegment::FindUsersFromSegments
 
-  def initialize(rule)
-    @rule = rule
+  def initialize(params)
+    @key = params[:key]
+    @negative = params[:negative]
+    @pattern = params[:pattern]
   end
 
   def call

@@ -39,19 +39,8 @@ class BuildSegment
     users = Array.new
 
     filter.each do |rule|
-      if rule[:name] == "$view"
-        find_events_users = BuildSegment::FindEvents.new(rule)
-        users << find_events_users.call
-      elsif rule[:name] == "$email"
-        find_messages_users = BuildSegment::FindMessages.new(rule)
-        users << find_messages_users.call
-      elsif rule[:name] == "$user"
-        find_users = BuildSegment::FindUsers.new(rule)
-        users << find_users.call
-      elsif rule[:name] == "$segment"
-        find_users = BuildSegment::FindSegments.new(rule)
-        users << find_users.call
-      end
+      find_users_to_add = BuildSegment::FindUsersToAdd.new(rule)
+      users << find_users_to_add.call
     end
 
     users_passing_all_rules(users)
