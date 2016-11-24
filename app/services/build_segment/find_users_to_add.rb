@@ -25,8 +25,9 @@ class BuildSegment::FindUsersToAdd
       elsif @rule[:name] == "$segment"
         find_users_from_segments = BuildSegment::FindUsersFromSegments.new(query)
         found_users = find_users_from_segments.call
-      else
-        return false
+      elsif @rule[:name] == "$custom" # custom events
+        find_users_from_custom_events = BuildSegment::FindUsersFromCustomEvents.new(query)
+        found_users = find_users_from_custom_events.call
       end
 
     found_users

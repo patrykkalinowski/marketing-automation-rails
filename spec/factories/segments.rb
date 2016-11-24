@@ -53,10 +53,10 @@ FactoryGirl.define do
     factory :segment_custom_event do
       filters [
         [
-          { name: "Example Event",
-            match: "empty",
+          { name: "$custom",
+            match: "~",
             properties: {
-              url: ""
+              name: "Event"
             }
           }
         ]
