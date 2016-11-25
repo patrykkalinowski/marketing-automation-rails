@@ -1,7 +1,7 @@
 class BuildSegment::FindUsersFromEvents
 
   def initialize(params)
-    @key = params[:key]
+    @key = Ahoy::Event.connection.quote_column_name(params[:key])
     @negative = params[:negative]
     @pattern = params[:pattern]
   end

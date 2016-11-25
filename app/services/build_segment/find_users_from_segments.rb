@@ -1,21 +1,24 @@
 class BuildSegment::FindUsersFromSegments
 
   def initialize(params)
-    @key = params[:key]
     @negative = params[:negative]
     @pattern = params[:pattern]
   end
 
   def call
+    if @negative
+      relation = Segment.where.not("name LIKE ?", @pattern)
+    else
+      relation = Segment.where("name LIKE ?", @pattern)
+    end
+
     users = Array.new
 
-    if @rule[:match] === "=" # exact match
-      segment = Segment.where(name: @rule[:properties][:name])
-      users = segment.user_ids
-    else
-      users = []
+    relation.each do |segment|
+      users << segment.users
     end
 
     users.uniq
   end
+  
 end

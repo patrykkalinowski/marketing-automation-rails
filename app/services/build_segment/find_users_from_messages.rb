@@ -1,7 +1,7 @@
 class BuildSegment::FindUsersFromMessages
 
   def initialize(params)
-    @key = params[:key]
+    @key = Ahoy::Message.connection.quote_column_name(params[:key])
     @negative = params[:negative]
     @pattern = params[:pattern]
   end
