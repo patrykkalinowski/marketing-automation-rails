@@ -104,6 +104,6 @@ describe BuildSegment do
     FactoryGirl.create(:user2)
 
     segment_builder = BuildSegment.new(segment)
-    expect(segment_builder.call).to raise_error(ActiveRecord::StatementError)
+    expect { segment_builder.call }.to raise_error(ActiveRecord::StatementInvalid)
   end
 end

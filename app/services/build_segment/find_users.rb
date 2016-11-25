@@ -1,8 +1,7 @@
 class BuildSegment::FindUsers
 
   def initialize(params)
-    # @key = User.connection.quote_column_name(params[:key])
-    @key = params[:key]
+    @key = User.connection.quote_column_name(params[:key])
     @negative = params[:negative]
     @pattern = params[:pattern]
   end

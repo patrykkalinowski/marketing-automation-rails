@@ -6,7 +6,7 @@ class Workflow < ActiveRecord::Base
   validates :filters, presence: true
 
   def build
-    segment_builder = BuildSegment.new(self)
+    segment_builder = BuildWorkflow.new(self)
     segment_builder.call
   end
 
