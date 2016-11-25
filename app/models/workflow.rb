@@ -10,6 +10,10 @@ class Workflow < ActiveRecord::Base
     segment_builder.call
   end
 
+  def enroll(user)
+
+  end
+
   def self.example
     name = "workflow name"
     filters = [
@@ -25,11 +29,18 @@ class Workflow < ActiveRecord::Base
     actions = [
       { name: "$email",
         action: "send",
-        id: 1
+        id: 1,
+        delay: 30000
       },
-      { name: "$segment",
-        action: "add",
-        id: 2
+      { name: "$email",
+        action: "send",
+        id: 8,
+        delay: 80000
+      },
+      { name: "$email",
+        action: "send",
+        id: 3,
+        delay: 0
       }
     ]
 
