@@ -97,4 +97,13 @@ describe BuildSegment do
     segment_builder = BuildSegment.new(segment)
     expect(segment_builder.call).to eql([])
   end
+
+  it "is protected from SQL injection" do
+    segment = FactoryGirl.create(:segment_sqli)
+    FactoryGirl.create(:user)
+    FactoryGirl.create(:user2)
+
+    segment_builder = BuildSegment.new(segment)
+    expect(segment_builder.call).to raise_error(ActiveRecord::StatementError)
+  end
 end

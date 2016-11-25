@@ -63,5 +63,18 @@ FactoryGirl.define do
       ]
     end
 
+    factory :segment_sqli do
+      filters [
+        [
+          { name: "$user",
+            match: "=",
+            properties: {
+              "email LIKE '%com%' OR email": ""
+            }
+          }
+        ]
+      ]
+    end
+
   end
 end

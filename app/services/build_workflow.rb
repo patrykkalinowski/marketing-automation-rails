@@ -1,0 +1,2 @@
+class BuildWorkflow < BuildSegment
+end

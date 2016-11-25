@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
 
   has_many :visits
   has_and_belongs_to_many :segments
+  has_and_belongs_to_many :workflows
 
   # display name if known, else use e-mail address
   def identity
