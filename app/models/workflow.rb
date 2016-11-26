@@ -10,10 +10,6 @@ class Workflow < ActiveRecord::Base
     segment_builder.call
   end
 
-  def enroll(user)
-
-  end
-
   def self.example
     name = "workflow name"
     filters = [

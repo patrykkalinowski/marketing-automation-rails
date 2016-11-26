@@ -2,14 +2,14 @@ class BuildSegment::FindUsersFromSegments
 
   def initialize(params)
     @negative = params[:negative]
-    @pattern = params[:pattern]
+    @segment_id = params[:pattern]
   end
 
   def call
     if @negative
-      relation = Segment.where.not("name LIKE ?", @pattern)
+      relation = Segment.where.not(id: @segment_id)
     else
-      relation = Segment.where("name LIKE ?", @pattern)
+      relation = Segment.find(@segment_id)
     end
 
     users = Array.new
@@ -20,5 +20,5 @@ class BuildSegment::FindUsersFromSegments
 
     users.uniq
   end
-  
+
 end
