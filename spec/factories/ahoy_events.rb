@@ -53,5 +53,9 @@ FactoryGirl.define do
       name "Example Event"
     end
 
+    factory :ahoy_event_name_lowercase do
+      name "example event"
+    end
+
   end
 end

@@ -8,9 +8,9 @@ class BuildSegment::FindUsers
 
   def call
     if @negative
-      users = User.where.not("#{@key} LIKE ?", @pattern)
+      users = User.where.not("#{@key} ILIKE ?", @pattern)
     else
-      users = User.where("#{@key} LIKE ?", @pattern)
+      users = User.where("#{@key} ILIKE ?", @pattern)
     end
 
     users.uniq

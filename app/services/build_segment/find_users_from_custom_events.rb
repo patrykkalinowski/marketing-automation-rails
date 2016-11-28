@@ -7,9 +7,9 @@ class BuildSegment::FindUsersFromCustomEvents
 
   def call
     if @negative
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("name LIKE ?", @pattern)
+      relation = Ahoy::Event.where.not(user_id: nil).where.not("name ILIKE ?", @pattern)
     else
-      relation = Ahoy::Event.where.not(user_id: nil).where("name LIKE ?", @pattern)
+      relation = Ahoy::Event.where.not(user_id: nil).where("name ILIKE ?", @pattern)
     end
 
     users = Array.new

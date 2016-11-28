@@ -88,6 +88,15 @@ describe BuildSegment do
     expect(segment_builder.call).to eql([1])
   end
 
+  it "is not case sensitive" do
+    segment = FactoryGirl.create(:segment_custom_event)
+    FactoryGirl.create(:user)
+    FactoryGirl.create(:ahoy_event_name_lowercase)
+
+    segment_builder = BuildSegment.new(segment)
+    expect(segment_builder.call).to eql([1])
+  end
+
 
 
   it "ignores events with no user" do
