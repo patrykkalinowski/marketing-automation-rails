@@ -1,7 +1,9 @@
 class BuildSegment::FindUsersFromEvents
 
   def initialize(params)
-    @key = Ahoy::Event.connection.quote_column_name(params[:key])
+    # this should prevent SQL injection, but breaks properties->> query (adds " around #{@key})
+    # @key = Ahoy::Event.connection.quote_column_name(params[:key])
+    @key = params[:key]
     @negative = params[:negative]
     @pattern = params[:pattern]
   end

@@ -1,0 +1,142 @@
+Filtry
+
+convert all strings to lowercase
+
+Events ($view, string):
+  properties:
+    url:
+      { name: "$view",
+        match: "=",
+        properties: {
+          url: "/",
+      }
+    page:
+      { name: "$view",
+        match: "=",
+        properties: {
+          page: "/",
+      }
+    title:
+      { name: "$view",
+        match: "=",
+        properties: {
+          title: "Title",
+      }
+  count:
+    events with url
+    events with page
+
+
+Custom Events ($custom):
+  { name: "Custom Event",
+    match: "=",
+    properties:
+      custom_property1: "custom_property_value1"
+      custom_property2: 123
+  }
+  count:
+    custom events with name
+
+Segments ($segment):
+  id:
+    { name: "$segment",
+      match: "=", # (= and != only)
+      id: 12
+    }
+
+Users ($user):
+  email:
+    { name: "$user",
+      match: "=",
+      properties:
+        email: "email@example.com"
+    }
+  _all other properties:
+    { name: "$user",
+      match: "=",
+      properties:
+        firstname: "John"
+    }
+
+Visits ($visit):
+  _all properties:
+    { name: "$visit",
+      match: "=",
+      properties:
+        firstname: "John"
+    }
+  count:
+    number of visits by user
+
+Emails ($email):
+  was sent email:
+    { name: "$email",
+      match: "=",
+      properties:
+        id: 1, # email template id, if not present will find any email
+        sent: true
+    }
+  received email:
+    { name: "$email",
+      match: "=",
+      properties:
+        id: 1,
+        received: true
+    }
+  opened email:
+    { name: "$email",
+      match: "=",
+      properties:
+        id: 1,
+        opened: true
+    }
+  clicked link in email:
+    { name: "$email",
+      match: "=",
+      properties:
+        id: 1,
+        clicked: true
+    }
+  count:
+    sent Emails
+    received emails
+    opened emails
+    clicked emails
+
+Workflows ($workflow):
+  enrolled in workflow:
+    { name: "$workflow",
+      match: "=",
+      properties:
+        id: 1,
+        enrolled: true
+    }
+  finished workflow:
+    { name: "$workflow",
+      match: "=",
+      properties:
+        id: 1,
+        finished: true
+    }
+  active in workflow:
+    { name: "$workflow",
+      match: "=",
+      properties:
+        id: 1,
+        active: true
+    }
+
+Forms ($form):
+  submitted form id:
+    { name: "$form",
+      match: "=",
+      properties:
+        id: 1,
+        submit: true
+    }
+  submitted any form on URL:
+    { name: "$form",
+      match: "=",
+      properties:
+        url: "http://example.com/signup"
+    }
