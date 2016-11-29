@@ -2,7 +2,7 @@ Filtry
 
 convert all strings to lowercase
 
-Events ($view, string):
+Events ($view, string): # done
   properties:
     url:
       { name: "$view",
@@ -27,24 +27,24 @@ Events ($view, string):
     events with page
 
 
-Custom Events ($custom):
+Custom Events ($custom): # done
   { name: "Custom Event",
     match: "=",
-    properties:
+    properties: # custom properties can be found using normal events, custom name + custom properties requires 2 rules (custom event + normal event)
       custom_property1: "custom_property_value1"
       custom_property2: 123
   }
   count:
     custom events with name
 
-Segments ($segment):
+Segments ($segment): # done
   id:
     { name: "$segment",
       match: "=", # (= and != only)
       id: 12
     }
 
-Users ($user):
+Users ($user): # done
   email:
     { name: "$user",
       match: "=",
@@ -69,28 +69,28 @@ Visits ($visit):
     number of visits by user
 
 Emails ($email):
-  was sent email:
+  was sent email: # TODO
     { name: "$email",
       match: "=",
       properties:
         id: 1, # email template id, if not present will find any email
-        sent: true
+        sent: true # how to check if value is not nil
     }
-  received email:
+  received email: # TODO
     { name: "$email",
       match: "=",
       properties:
         id: 1,
         received: true
     }
-  opened email:
+  opened email: # TODO
     { name: "$email",
       match: "=",
       properties:
         id: 1,
         opened: true
     }
-  clicked link in email:
+  clicked link in email: # TODO
     { name: "$email",
       match: "=",
       properties:
@@ -104,21 +104,21 @@ Emails ($email):
     clicked emails
 
 Workflows ($workflow):
-  enrolled in workflow:
+  enrolled in workflow: # TODO
     { name: "$workflow",
       match: "=",
       properties:
         id: 1,
         enrolled: true
     }
-  finished workflow:
+  finished workflow: # TODO
     { name: "$workflow",
       match: "=",
       properties:
         id: 1,
         finished: true
     }
-  active in workflow:
+  active in workflow: # TODO
     { name: "$workflow",
       match: "=",
       properties:
@@ -126,7 +126,7 @@ Workflows ($workflow):
         active: true
     }
 
-Forms ($form):
+Forms ($form): # TODO
   submitted form id:
     { name: "$form",
       match: "=",

@@ -15,16 +15,6 @@ class BuildSegment
 
   private
 
-  def remove_users(segment, users_to_add)
-    segment.users.where.not(id: users_to_add.uniq).delete_all
-  end
-
-  def add_users(segment, users_to_add)
-    users_to_add.uniq.each do |user|
-      segment.users << User.find(user)
-    end
-  end
-
   def users_meeting_requirements_for(segment)
     users = Array.new
 
@@ -58,6 +48,16 @@ class BuildSegment
     end
 
     users_to_add
+  end
+
+  def remove_users(segment, users_to_add)
+    segment.users.where.not(id: users_to_add.uniq).delete_all
+  end
+
+  def add_users(segment, users_to_add)
+    users_to_add.uniq.each do |user|
+      segment.users << User.find(user)
+    end
   end
 
 end

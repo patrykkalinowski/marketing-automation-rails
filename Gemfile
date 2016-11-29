@@ -42,6 +42,8 @@ gem 'ahoy_matey'
 gem 'activeuuid', '>= 0.5.0'
 # Ahoy for emails
 gem 'ahoy_email'
+# Background jobs
+gem 'sidekiq'
 
 # TinyMCE for messages
 gem 'tinymce-rails'
