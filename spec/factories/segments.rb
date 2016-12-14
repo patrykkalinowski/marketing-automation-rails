@@ -41,7 +41,7 @@ FactoryGirl.define do
       filters [
         [
           { name: "$view",
-            match: "empty",
+            match: "=",
             properties: {
               url: ""
             }

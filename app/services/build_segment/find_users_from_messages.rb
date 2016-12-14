@@ -8,9 +8,9 @@ class BuildSegment::FindUsersFromMessages
 
   def call
     if @negative
-      relation = Ahoy::Message.where.not(user_id: nil).where.not("#{@key} LIKE ?", @pattern)
+      relation = Ahoy::Message.find_users_not(key: @key, pattern: @pattern)
     else
-      relation = Ahoy::Message.where.not(user_id: nil).where("#{@key} LIKE ?", @pattern)
+      relation = Ahoy::Message.find_users(key: @key, pattern: @pattern)
     end
 
     users = Array.new

@@ -3,11 +3,12 @@ class BuildSegment::FindUsersToAdd
   def initialize(rule)
     @rule = rule
     @rules_hash = {
-      "=": "s",
-      "^": "s%",
-      "~": "%s%",
-      "$": "%s",
-      "empty": ""
+      "=": ["^s$", "~*"], # matches
+      "~": ["s", "~*"], # contains, also accepts regex provided by user
+      "^": ["^s", "~*"], # begins with using regex
+      "$": ["s$", "~*"], # ends with using regex
+      ">": ["s", ">"], # more than x
+      "<": ["s", "<"] # less than x
     }
 
   end
@@ -42,12 +43,14 @@ class BuildSegment::FindUsersToAdd
       negative = false
     end
       # create wildcard string for database query (ex. "page%")
-      pattern = @rules_hash[:"#{match}"].gsub(/s/, @rule[:properties].values.first.to_s)
+      pattern = @rules_hash[:"#{match}"].first.gsub(/s/, @rule[:properties].values.first.to_s)
+      pattern_match = @rules_hash[:"#{match}"][1]
       key = @rule[:properties].keys.first.to_s
 
     return {
       key: key,
       pattern: pattern,
+      pattern_match: pattern_match,
       negative: negative
     }
   end
