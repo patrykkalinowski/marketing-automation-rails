@@ -107,7 +107,7 @@ describe BuildSegment do
     expect(segment_builder.call).to eql([])
   end
 
-  it "is protected from SQL injection" do
+  it "is protected from SQL injection in users" do
     segment = FactoryGirl.create(:segment_sqli)
     FactoryGirl.create(:user)
     FactoryGirl.create(:user2)
