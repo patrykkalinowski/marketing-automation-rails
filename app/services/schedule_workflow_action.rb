@@ -19,7 +19,7 @@ class ScheduleWorkflowAction
   private
 
   def schedule_message
-    SendMessageJob.set(wait: @delay.seconds).perform_later
+    SendMessageJob.set(wait: @delay.seconds).perform_later(@user, @action[:id])
   end
 
   def schedule_segment
