@@ -3,23 +3,23 @@ require 'rails_helper'
 RSpec.describe SendMessageJob, type: :job do
   include ActiveJob::TestHelper
 
+  it { is_expected.to be_processed_in :default }
+  
   it 'schedules message for user' do
     ActiveJob::Base.queue_adapter = :test
 
     workflow = FactoryGirl.create(:workflow)
     user = FactoryGirl.create(:user)
-    workflow.actions.each do |action|
-      action_scheduler = ScheduleWorkflowAction.new(user: user, action: action)
-      action_scheduler.call
+    workflow.users << user
 
-      expect {
-        SendMessageJob.to have_enqueued_job.with(user, action[:id])
-      }
+    enroll = EnrollUserInWorkflow.new(user: user, workflow: workflow)
+    enroll.call
 
-    end
-
+    expect {
+      SendMessageJob.to have_enqueued_job.with(user, workflow[:actions].first[:id])
+    }
     expect(enqueued_jobs.size).to eq(1)
-
-
   end
+
+
 end
