@@ -4,12 +4,12 @@ module Ahoy
 
     belongs_to :user, AhoyEmail.belongs_to.merge(polymorphic: true)
 
-    def self.find_users(params)
-      self.where.not(user_id: nil).where("#{params[:key]} #{params[:pattern_match]} ?", params[:pattern])
+    def self.find_users(query)
+      self.where.not(user_id: nil).where("#{query[:key]} #{query[:pattern_match]} ?", query[:pattern])
     end
 
-    def self.find_users_not(params)
-      self.where.not(user_id: nil).where.not("#{params[:key]} #{params[:pattern_match]} ?", params[:pattern])
+    def self.find_users_not(query)
+      self.where.not(user_id: nil).where.not("#{query[:key]} #{query[:pattern_match]} ?", query[:pattern])
     end
 
   end

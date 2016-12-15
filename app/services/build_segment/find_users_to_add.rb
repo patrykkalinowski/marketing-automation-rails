@@ -62,10 +62,9 @@ class BuildSegment::FindUsersToAdd
 
   def from_events(query)
     if query[:negative]
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("properties->>'#{query[:key]}' #{query[:pattern_match]} ?", query[:pattern])
-      # regex: Ahoy::Event.where("properties->>'title' ~* ?", ".*automation.*")
+      relation = Ahoy::Event.find_users_not(query)
     else
-      relation = Ahoy::Event.where.not(user_id: nil).where("properties->>'#{query[:key]}' #{query[:pattern_match]} ?", query[:pattern])
+      relation = Ahoy::Event.find_users(query)
     end
 
     user_ids(relation)
@@ -73,9 +72,9 @@ class BuildSegment::FindUsersToAdd
 
   def from_custom_events(query)
     if query[:negative]
-      relation = Ahoy::Event.where.not(user_id: nil).where.not("name #{query[:pattern_match]} ?", query[:pattern])
+      relation = Ahoy::Event.find_users_custom_not(query)
     else
-      relation = Ahoy::Event.where.not(user_id: nil).where("name #{query[:pattern_match]} ?", query[:pattern])
+      relation = Ahoy::Event.find_users_custom(query)
     end
 
     user_ids(relation)
@@ -93,9 +92,9 @@ class BuildSegment::FindUsersToAdd
 
   def from_segments(query)
     if query[:negative]
-      relation = Segment.where.not(id: query[:pattern])
+      relation = Segment.find_users_not(query)
     else
-      relation = Segment.find(query[:pattern])
+      relation = Segment.find_users(query)
     end
 
     users = Array.new
@@ -108,11 +107,10 @@ class BuildSegment::FindUsersToAdd
   end
 
   def from_users(query)
-    sql_query = ActiveRecord::Base::sanitize("#{query[:key]} #{query[:pattern_match]} ?")
     if query[:negative]
-      users = User.where.not(sql_query, query[:pattern])
+      users = User.find_users_not(query)
     else
-      users = User.where(sql_query, query[:pattern])
+      users = User.find_users(query)
     end
 
     users.uniq

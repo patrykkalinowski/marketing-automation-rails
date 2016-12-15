@@ -16,6 +16,14 @@ class Segment < ActiveRecord::Base
     end
   end
 
+  def self.find_users(query)
+    self.where(id: query[:pattern])
+  end
+
+  def self.find_users_not(query)
+    self.where.not(id: query[:pattern])
+  end
+
   def self.example2
     # segment has many filters
     # filters have many rules

@@ -17,6 +17,16 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.find_users(query)
+    sql_query = ActiveRecord::Base::sanitize("#{query[:key]} #{query[:pattern_match]} ?")
+    self.where(sql_query, query[:pattern])
+  end
+
+  def self.find_users_not(query)
+    sql_query = ActiveRecord::Base::sanitize("#{query[:key]} #{query[:pattern_match]} ?")
+    self.where.not(sql_query, query[:pattern])
+  end
+
   def prepare_timeline
     timeline = Array.new
     # combine all events and messages to one array
