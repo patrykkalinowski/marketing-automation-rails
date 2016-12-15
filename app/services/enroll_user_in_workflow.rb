@@ -30,7 +30,7 @@ class EnrollUserInWorkflow
     # action: {
     # name: "$email",
     # action: "send",
-    # template_id: 1,
+    # id: 1,
     # delay: 1000 }
 
     SendMessageJob.set(wait: action[:delay].seconds).perform_later(workflow_id: @workflow.id, user_id: @user.id, template_id: action[:id])
