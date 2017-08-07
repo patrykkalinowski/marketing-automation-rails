@@ -62,6 +62,21 @@ describe BuildSegment do
     expect(segment_builder.call).to eql([2])
   end
 
+  it "finds user who visited page '/' and url containing 'test2'" do
+    segment = FactoryGirl.create(:segment_homepage_and_params_match)
+    FactoryGirl.create(:ahoy_event)
+    FactoryGirl.create(:ahoy_event_params_user1)
+    FactoryGirl.create(:ahoy_event_params_user2)
+
+
+    FactoryGirl.create(:user)
+    FactoryGirl.create(:user2)
+    
+
+    segment_builder = BuildSegment.new(segment)
+    expect(segment_builder.call).to eql([1])
+  end
+
   it "does not find users visited empty url" do
     segment = FactoryGirl.create(:segment_url_empty)
     FactoryGirl.create(:ahoy_event)

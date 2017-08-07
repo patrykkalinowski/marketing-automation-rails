@@ -24,6 +24,25 @@ FactoryGirl.define do
       ]
     end
 
+    factory :segment_homepage_and_params_match do
+      filters [
+        [
+          { name: "$view",
+            match: "=",
+            properties: {
+              page: "/"
+            }
+          },
+          { name: "$view",
+            match: "~",
+            properties: {
+              url: "test2"
+            }
+          }
+        ]
+      ]
+    end
+
     factory :segment_url_params do
       filters [
         [

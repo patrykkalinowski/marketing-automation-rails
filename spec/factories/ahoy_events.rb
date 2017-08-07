@@ -24,6 +24,15 @@ FactoryGirl.define do
       } }
     end
 
+    factory :ahoy_event_params_user1 do
+      user_id 1
+      properties { {
+        page: "/",
+        url: "http://localhost:3000/?params=test2",
+        title: "Marketing Automation Rails"
+      } }
+    end
+
     factory :ahoy_event_params_user2 do
       user_id 2
       properties { {
