@@ -44,6 +44,8 @@ gem 'activeuuid', '>= 0.5.0'
 gem 'ahoy_email'
 # Background jobs
 gem 'sidekiq'
+# # Cron jobs
+# gem 'sidetiq'
 
 # TinyMCE for messages
 gem 'tinymce-rails'

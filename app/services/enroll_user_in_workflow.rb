@@ -33,7 +33,7 @@ class EnrollUserInWorkflow
     # id: 1,
     # delay: 1000 }
 
-    SendMessageJob.set(wait: action[:delay].seconds).perform_later(workflow_id: @workflow.id, user_id: @user.id, template_id: action[:id])
+    MessageWorker.perform_in(action[:delay].seconds, workflow_id: @workflow.id, user_id: @user.id, template_id: action[:id])
   end
 
   def schedule_segment(action)
