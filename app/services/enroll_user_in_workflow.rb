@@ -33,7 +33,8 @@ class EnrollUserInWorkflow
     # id: 1,
     # delay: 1000 }
 
-    MessageWorker.perform_in(action[:delay].seconds, workflow_id: @workflow.id, user_id: @user.id, template_id: action[:id])
+    WorkflowMailer.basic(@user).deliver_later(wait: action[:delay].seconds)
+
   end
 
   def schedule_segment(action)

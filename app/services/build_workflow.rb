@@ -7,9 +7,14 @@ class BuildWorkflow < BuildSegment
   def call
     users_to_add = users_meeting_requirements_for(@workflow)
 
-    add_users(@workflow, users_to_add)
+    # Launch workflow for new users
+    users_to_add.each do |user|
+      unless @workflow.users.exists?(user)
+        launch_workflow_for(user)
+      end
+    end
 
-    # TODO: Launch workflow for new users
+    add_users(@workflow, users_to_add)
   end
 
   private
