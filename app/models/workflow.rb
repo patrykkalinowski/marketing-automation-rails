@@ -10,14 +10,21 @@ class Workflow < ActiveRecord::Base
     segment_builder.call
   end
 
+  def launch
+    self.users.each do |user|
+      enroll = EnrollUserInWorkflow.new({user: user, workflow: self})
+      enroll.call
+    end
+  end
+
   def self.example
     name = "workflow name"
     filters = [
       [
-        { name: "$view",
-          match: "~",
+        { name: "$segment",
+          match: "=",
           properties: {
-            page: "/",
+            id: "1",
           }
         }
       ]
@@ -26,17 +33,17 @@ class Workflow < ActiveRecord::Base
       { name: "$email",
         action: "send",
         id: 1,
-        delay: 30000
+        delay: 300
       },
       { name: "$email",
         action: "send",
-        id: 8,
-        delay: 80000
+        id: 2,
+        delay: 7200
       },
       { name: "$email",
         action: "send",
         id: 3,
-        delay: 0
+        delay: 259200
       }
     ]
 

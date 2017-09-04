@@ -4,6 +4,8 @@ class Segment < ActiveRecord::Base
   has_and_belongs_to_many :users
   validates :filters, presence: true
 
+  after_update :build_workflows
+
   def build
     segment_builder = BuildSegment.new(self)
     segment_builder.call
@@ -22,6 +24,12 @@ class Segment < ActiveRecord::Base
 
   def self.find_users_not(query)
     self.where.not(id: query[:pattern])
+  end
+
+  def build_workflows
+    Workflow.each do |workflow|
+      workflow.build
+    end
   end
 
   def self.example2
