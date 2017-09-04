@@ -16,11 +16,6 @@ FactoryGirl.define do
         action: "send",
         id: 1,
         delay: 1000
-      },
-      { name: "$segment",
-        action: "add",
-        id: 2,
-        delay: 1000
       }
     ]
 
