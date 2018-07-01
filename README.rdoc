@@ -1,28 +1,7 @@
-== README
+== marketing-automation-rails
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a simple, proof of concept app created to show how marketing automation works from the tech side.
 
-Things you may want to cover:
+It's been used as an example app in my series of articles *[How marketing automation works](https://patrykkalinowski.com/jak-dziala-automatyzacja-marketingu)* (written in Polish).
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+It uses Ahoy gem for analytics and features segmenting users based on their activity and sending emails based on those segments.
