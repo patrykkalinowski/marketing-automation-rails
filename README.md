@@ -1,4 +1,4 @@
-== marketing-automation-rails
+## marketing-automation-rails
 
 This is a simple, proof of concept app created to show how marketing automation works from the tech side.
 
