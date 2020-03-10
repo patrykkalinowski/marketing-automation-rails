@@ -246,7 +246,7 @@ GEM
       thread_safe (~> 0.1)
     uglifier (3.0.2)
       execjs (>= 0.3.0, < 3)
-    user_agent_parser (2.3.0)
+    user_agent_parser (2.6.0)
     uuidtools (2.1.5)
     warden (1.2.6)
       rack (>= 1.0)
