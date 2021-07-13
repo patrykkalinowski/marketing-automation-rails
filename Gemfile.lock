@@ -39,7 +39,8 @@ GEM
     activeuuid (0.6.1)
       activerecord (>= 3.1)
       uuidtools
-    addressable (2.4.0)
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
     ahoy_email (0.4.0)
       addressable
       nokogiri
@@ -138,6 +139,7 @@ GEM
       slop (~> 3.4)
     pry-rails (0.3.4)
       pry (>= 0.9.10)
+    public_suffix (4.0.6)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.4)
